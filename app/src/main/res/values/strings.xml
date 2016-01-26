@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">gcmuser</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="greg">GCM Registration</string>
+    <string name="nm">Name</string>
+    <string name="reg">Register</string>
+    <string name="dereg">Deregister</string>
+</resources>
