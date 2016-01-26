@@ -54,7 +54,18 @@ public class MainActivity extends AppCompatActivity implements GCMListener {
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GCMManager.getInstance(applicationContext).registerListener(MainActivity.this);
+                SharedPreferences prefs = getSharedPreferences("UserDetails",
+                        Context.MODE_PRIVATE);
+                String registrationId = prefs.getString("Regid", "");
+                name = et.getText().toString();
+                Log.d("reg1", registrationId);
+                Log.d("name",name);
+                if(registrationId.equals("")) {
+                    GCMManager.getInstance(applicationContext).registerListener(MainActivity.this);
+                }
+                else {
+                    Toast.makeText(getApplicationContext(),"Already Have Registation Id for "+name,Toast.LENGTH_LONG).show();
+                }
 
             }
         });
@@ -177,22 +188,14 @@ public class MainActivity extends AppCompatActivity implements GCMListener {
     public void onDeviceRegisted(String s) {
         Log.i("id:",s);
         int len = s.length();
-        Log.i("len:",String.valueOf(len));
+        Log.i("len:", String.valueOf(len));
         rid=s;
-        SharedPreferences prefs = getSharedPreferences("UserDetails",
-                Context.MODE_PRIVATE);
-        String registrationId = prefs.getString("Regid", "");
-        name = et.getText().toString();
-        Log.d("reg1", registrationId);
-        Log.d("name",name);
-        if(registrationId.equals("")){
-            startprogress();
-            storeRegIdinSharedPref(applicationContext, rid, name);
-            volleyconnect(rid, name);
-        }
-        else{
-            Toast.makeText(getApplicationContext(),"Already Have Registation Id",Toast.LENGTH_LONG).show();
-        }
+
+
+        startprogress();
+        storeRegIdinSharedPref(applicationContext, rid, name);
+        volleyconnect(rid, name);
+
 
 
     }
