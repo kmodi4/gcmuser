@@ -62,15 +62,7 @@ public class MainActivity extends AppCompatActivity implements GCMListener {
 
 
         applicationContext = getApplicationContext();
-        /*Bundle extras = getIntent().getExtras();
-        //Log.i("intent:",extras.getString("data"));
-        if(extras != null){
-            String data = extras.getString("data");
-            Log.i("intent",data);
-            tv1.setText(data);
-        }*/
-        //String str = getIntent().getStringExtra("data");
-        //Log.i("str",str);
+
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -102,10 +94,6 @@ public class MainActivity extends AppCompatActivity implements GCMListener {
             }
         });
 
-       /*if (str != null) {
-            // Set the messa
-            tv.setText(str);
-        }*/
 
 
     }
@@ -149,9 +137,6 @@ public class MainActivity extends AppCompatActivity implements GCMListener {
 
     public void volleyconnect(String regid, String name){
 
-       /* Map<String, String> params = new HashMap<String, String>();
-        params.put("username", username);
-        params.put("password",password);*/
         JSONObject jo = new JSONObject();
         try {
             jo.put("regid", regid);
@@ -200,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements GCMListener {
 
     }
 
-    private void notify(Context context,String message) {
+    /*private void notify(Context context,String message) {
         NotificationManager mNotificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -221,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements GCMListener {
 
         mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-    }
+    }*/
 
 
 
@@ -237,15 +222,26 @@ public class MainActivity extends AppCompatActivity implements GCMListener {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        Intent i;
+        switch (id){
+            case R.id.action_settings:
+                return true;
+
+            case R.id.Users:
+                i = new Intent(MainActivity.this,Userlist.class);
+                startActivity(i);
+                break;
+
+
+
+
+
         }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -269,15 +265,7 @@ public class MainActivity extends AppCompatActivity implements GCMListener {
     @Override
     public void onMessage(String s, Bundle bundle) {
             Log.i("msg",s);
-           /* bundle = getIntent().getExtras();
-        String value1 = bundle.getString("message");
-        Log.i("Datamsg:",value1);
-        applicationContext = getApplicationContext();
-        //sendNotification(value1);
-        notify(applicationContext,value1);
-        for (String key : bundle.keySet()) {
-            Log.i("App:", "> " + key + ": " + bundle.get(key));
-        }*/
+
 
 
     }

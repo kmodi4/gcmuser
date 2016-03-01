@@ -1,8 +1,5 @@
 package com.example.karan.gcmuser;
 
-/**
- * Created by KARAN on 18-08-2015.
- */
 
 
 import android.content.Context;

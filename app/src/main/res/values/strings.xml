@@ -7,4 +7,7 @@
     <string name="nm">Name</string>
     <string name="reg">Register</string>
     <string name="dereg">Deregister</string>
+    <string name="title_activity_userlist">Userlist</string>
+    <string name="user">Users</string>
+    <string name="send">Send</string>
 </resources>
