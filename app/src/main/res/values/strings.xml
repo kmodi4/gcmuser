@@ -17,4 +17,5 @@
     <string name="hello">Hello</string>
     <string name="sendmsg">Send</string>
     <string name="chat">Chat</string>
+    <string name="refresh">Refresh</string>
 </resources>

@@ -3,6 +3,7 @@ package com.example.karan.gcmuser;
 import com.example.karan.gcmuser.MyDialogFragment.EditDialogListener;
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -52,10 +53,13 @@ public class Userlist extends AppCompatActivity implements EditDialogListener {
 
                 String username = String.valueOf(parent.getItemAtPosition(position));
                 bundle.putString("name", username);
-                FragmentManager fm = getFragmentManager();
+                Intent i = new Intent(Userlist.this,ChatList.class);
+                i.putExtra("name",username);
+                startActivity(i);
+                /*FragmentManager fm = getFragmentManager();
                 MyDialogFragment dialogFragment = new MyDialogFragment();
                 dialogFragment.setArguments(bundle);
-                dialogFragment.show(fm, "Sample Fragment");
+                dialogFragment.show(fm, "Sample Fragment");*/
                 //startprogress("Sending msg...");
                 //    volleyRequest(username);
             }
@@ -149,6 +153,11 @@ public class Userlist extends AppCompatActivity implements EditDialogListener {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            return true;
+        }
+        else if(id == R.id.refresh){
+            startprogress("Fetching List...");
+            volleyconnect();
             return true;
         }
 

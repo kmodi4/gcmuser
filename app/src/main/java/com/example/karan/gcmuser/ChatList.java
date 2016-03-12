@@ -1,6 +1,10 @@
 package com.example.karan.gcmuser;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -12,6 +16,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -22,6 +36,10 @@ public class ChatList extends AppCompatActivity {
     private EditText mEditTextMessage;
     private ImageView mImageView;
     private ChatMessageAdapter mAdapter;
+    RequestQueue mQueue1;
+    private static final String LOGIN_URL = "http://kmodi4.net76.net/GcmMsg.php";
+    private BroadcastReceiver mRegistrationBroadcastReceiver;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +54,8 @@ public class ChatList extends AppCompatActivity {
 
         mAdapter = new ChatMessageAdapter(this, new ArrayList<ChatMessage>());
         mListView.setAdapter(mAdapter);
+        mQueue1 = CustomVolleyRequestQueue.getInstance(this.getApplicationContext())
+                .getRequestQueue();
 
         mButtonSend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -44,11 +64,33 @@ public class ChatList extends AppCompatActivity {
                 if (TextUtils.isEmpty(message)) {
                     return;
                 }
-                sendMessage(message);
-                mEditTextMessage.setText("");
-                scrollMyListViewToBottom();
+                Bundle b = getIntent().getExtras();
+                if(b!=null) {
+                    if (b.containsKey("name")) {
+                        sendMessage(message);
+                        String name = getIntent().getStringExtra("name");
+                        volleyRequest(name, message);
+                        mEditTextMessage.setText("");
+                        scrollMyListViewToBottom();
+                    }
+                }
+                else
+                    Toast.makeText(getApplicationContext(),"Error Occured",Toast.LENGTH_SHORT).show();
             }
         });
+
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String message = intent.getStringExtra("data");
+                ChatMessage chatMessage = new ChatMessage(message, false, false);
+                mAdapter.add(chatMessage);
+                    scrollMyListViewToBottom();
+                //tv1.setText(message);
+
+            }
+        };
+
     }
 
     private void scrollMyListViewToBottom() {
@@ -65,12 +107,20 @@ public class ChatList extends AppCompatActivity {
         ChatMessage chatMessage = new ChatMessage(message, true, false);
         mAdapter.add(chatMessage);
 
-        mimicOtherMessage(message);
+        //mimicOtherMessage(message);
     }
 
     private void mimicOtherMessage(String message) {
+
         ChatMessage chatMessage = new ChatMessage(message, false, false);
         mAdapter.add(chatMessage);
+    }
+
+    private void ReceiveFromOther(String message){
+        //String message = getIntent().getStringExtra("data");
+        ChatMessage chatMessage = new ChatMessage(message, false, false);
+        mAdapter.add(chatMessage);
+
     }
 
     private void sendMessage() {
@@ -86,6 +136,19 @@ public class ChatList extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver, new IntentFilter("pushmsg"));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+    }
+
+    @Override
     public void onNewIntent(Intent intent) {
         Bundle extras = intent.getExtras();
         if (extras != null) {
@@ -94,9 +157,53 @@ public class ChatList extends AppCompatActivity {
                 // extract the extra-data in the Notification
                 String msg = extras.getString("data");
                 Log.i("newIntent", msg);
+                ChatMessage chatMessage = new ChatMessage(msg, false, false);
+                mAdapter.add(chatMessage);
                 //tv1.setText(msg);
             }
         }
+    }
+
+    public void volleyRequest(String username,String msg){
+
+        JSONObject jo = new JSONObject();
+
+        Log.i("name:", username);
+        try {
+            jo.put("name",username);
+            jo.put("msg",msg);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest req = new JsonObjectRequest(LOGIN_URL, jo,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        try {
+                            int i = response.getInt("success");
+                            //String msg = response.getString("message");
+                            if(i==0){
+                                Toast.makeText(getApplicationContext(),"invalid Registration",Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.e("Error: ", error.getMessage());
+                Log.i("Eror:", error.toString());
+
+                //Toast.makeText(getActivity(), "Unknown Error", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+        mQueue1.add(req);
+
     }
 
     @Override

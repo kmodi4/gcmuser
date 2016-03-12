@@ -42,11 +42,13 @@
 
         <activity
             android:name=".Userlist"
-            android:label="@string/title_activity_userlist" >
+            android:label="@string/title_activity_userlist"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".ChatList"
-            android:label="@string/title_activity_chat_list" >
+            android:label="@string/title_activity_chat_list"
+            android:screenOrientation="portrait">
         </activity>
     </application>
 

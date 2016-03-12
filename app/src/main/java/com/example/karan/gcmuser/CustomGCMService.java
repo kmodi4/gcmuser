@@ -38,7 +38,7 @@ public class CustomGCMService extends GCMListenerService {
         mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        Intent intent = new Intent(this, MainActivity.class)
+        Intent intent = new Intent(this, ChatList.class)
                 //.addFlags(PendingIntent.FLAG_UPDATE_CURRENT)
                 .putExtra("data", msg)
                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
