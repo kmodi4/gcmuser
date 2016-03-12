@@ -25,5 +25,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.1.1'
     compile 'com.github.iammert:FastGCM:1.1'
     compile 'com.mcxiaoke.volley:library:1.0.17'
+    compile 'me.himanshusoni.chatmessageview:chat-message-view:1.0.3'
 
 }

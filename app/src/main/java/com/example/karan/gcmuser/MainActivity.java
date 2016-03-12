@@ -4,11 +4,14 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -47,6 +50,20 @@ public class MainActivity extends AppCompatActivity implements GCMListener {
     private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
     private static final String LOGIN_URL = "http://kmodi4.net76.net/reg.php";
+    private BroadcastReceiver mRegistrationBroadcastReceiver;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,new IntentFilter("pushmsg"));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +110,15 @@ public class MainActivity extends AppCompatActivity implements GCMListener {
                 Toast.makeText(MainActivity.this, "DeRegister Successfully", Toast.LENGTH_SHORT).show();
             }
         });
+
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String message = intent.getStringExtra("data");
+                tv1.setText(message);
+
+            }
+            };
 
 
 
@@ -233,6 +259,11 @@ public class MainActivity extends AppCompatActivity implements GCMListener {
 
             case R.id.Users:
                 i = new Intent(MainActivity.this,Userlist.class);
+                startActivity(i);
+                break;
+
+            case R.id.Chat:
+                i = new Intent(MainActivity.this,ChatList.class);
                 startActivity(i);
                 break;
 

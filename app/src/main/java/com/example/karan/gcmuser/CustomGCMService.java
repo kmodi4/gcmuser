@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 
 import java.util.Random;
 
@@ -28,7 +29,8 @@ public class CustomGCMService extends GCMListenerService {
         // .
 
         String msg = data.getString("message");
-        sendNotification(from,msg);
+        sendNotification(from, msg);
+
 
     }
 
@@ -41,6 +43,11 @@ public class CustomGCMService extends GCMListenerService {
                 .putExtra("data", msg)
                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                         Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        Intent pushmsg = new Intent("pushmsg")
+        .putExtra("data", msg);
+
+        LocalBroadcastManager.getInstance(this).sendBroadcast(pushmsg);
 
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, new Random().nextInt(),
