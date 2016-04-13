@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -37,6 +38,8 @@ public class ChatList extends AppCompatActivity {
     private ImageView mImageView;
     private ChatMessageAdapter mAdapter;
     RequestQueue mQueue1;
+    private String Sender;
+    private String Receiver = "";
     private static final String LOGIN_URL = "http://kmodi4.net76.net/GcmMsg.php";
     private BroadcastReceiver mRegistrationBroadcastReceiver;
 
@@ -57,6 +60,11 @@ public class ChatList extends AppCompatActivity {
         mQueue1 = CustomVolleyRequestQueue.getInstance(this.getApplicationContext())
                 .getRequestQueue();
 
+        SharedPreferences prefs = getSharedPreferences("UserDetails",
+                Context.MODE_PRIVATE);
+        Sender = prefs.getString("Name", "");
+        onnotifiCLick();
+
         mButtonSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,25 +72,43 @@ public class ChatList extends AppCompatActivity {
                 if (TextUtils.isEmpty(message)) {
                     return;
                 }
+
                 Bundle b = getIntent().getExtras();
                 if(b!=null) {
                     if (b.containsKey("name")) {
+
                         sendMessage(message);
+                        message = Sender + " "+ message;
                         String name = getIntent().getStringExtra("name");
                         volleyRequest(name, message);
                         mEditTextMessage.setText("");
                         scrollMyListViewToBottom();
                     }
+                    else {
+
+                        if (Receiver.equals("")) {
+                            Toast.makeText(getApplicationContext(), "Sending Problem", Toast.LENGTH_SHORT).show();
+                        } else {
+                            sendMessage(message);
+                            message = Sender + " "+ message;
+                            volleyRequest(Receiver, message);
+                            mEditTextMessage.setText("");
+                            scrollMyListViewToBottom();
+                        }
+                    }
                 }
-                else
-                    Toast.makeText(getApplicationContext(),"Error Occured",Toast.LENGTH_SHORT).show();
+                else {
+                        Toast.makeText(getApplicationContext(), "Error Occured", Toast.LENGTH_SHORT).show();
+                }
             }
+
         });
 
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String message = intent.getStringExtra("data");
+                Receiver = intent.getStringExtra("sender");
                 ChatMessage chatMessage = new ChatMessage(message, false, false);
                 mAdapter.add(chatMessage);
                     scrollMyListViewToBottom();
@@ -135,6 +161,25 @@ public class ChatList extends AppCompatActivity {
         mAdapter.add(chatMessage);
     }
 
+    public void onnotifiCLick(){
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            if (extras.containsKey("data")) {
+                //setContentView(R.layout.viewmain);
+                // extract the extra-data in the Notification
+                String msg = extras.getString("data");
+                Receiver = extras.getString("sender");
+
+
+                Log.i("newIntent", msg);
+
+                ChatMessage chatMessage = new ChatMessage(msg, false, false);
+                mAdapter.add(chatMessage);
+                //tv1.setText(msg);
+            }
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -156,7 +201,9 @@ public class ChatList extends AppCompatActivity {
                 //setContentView(R.layout.viewmain);
                 // extract the extra-data in the Notification
                 String msg = extras.getString("data");
+                Receiver = extras.getString("sender");
                 Log.i("newIntent", msg);
+
                 ChatMessage chatMessage = new ChatMessage(msg, false, false);
                 mAdapter.add(chatMessage);
                 //tv1.setText(msg);

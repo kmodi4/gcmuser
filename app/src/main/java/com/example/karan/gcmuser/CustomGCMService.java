@@ -19,6 +19,7 @@ public class CustomGCMService extends GCMListenerService {
     //private static final String TAG = "GcmIntentService";
     private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
+    String Sender;
 
     @Override
     public void onMessageReceived(String from, Bundle data) {
@@ -29,6 +30,12 @@ public class CustomGCMService extends GCMListenerService {
         // .
 
         String msg = data.getString("message");
+        if (msg != null) {
+            int index = msg.indexOf(" ");
+            if(index!=-1)
+               Sender = msg.substring(0,index);
+            msg = msg.substring(msg.indexOf(" ")+1,msg.length());
+        }
         sendNotification(from, msg);
 
 
@@ -41,11 +48,13 @@ public class CustomGCMService extends GCMListenerService {
         Intent intent = new Intent(this, ChatList.class)
                 //.addFlags(PendingIntent.FLAG_UPDATE_CURRENT)
                 .putExtra("data", msg)
+                .putExtra("sender",Sender)
                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                         Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         Intent pushmsg = new Intent("pushmsg")
-        .putExtra("data", msg);
+        .putExtra("data", msg)
+                .putExtra("sender",Sender);
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(pushmsg);
 
@@ -56,7 +65,7 @@ public class CustomGCMService extends GCMListenerService {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         // .setSmallIcon(R.drawable.ic_stat_gcm)
-                        .setContentTitle("senderId:"+sender)
+                        .setContentTitle("From:"+Sender)
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setAutoCancel(true)
                         .setStyle(new NotificationCompat.BigTextStyle()
